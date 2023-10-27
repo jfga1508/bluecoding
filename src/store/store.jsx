@@ -1,10 +1,9 @@
+// @ts-nocheck
 import { configureStore } from '@reduxjs/toolkit';
-import { cartReducer } from './cartSlide';
-import { clientsReducer } from './clientsSlide';
+import { clientsReducer } from './giftSlides,jsx';
 
 const store = configureStore({
     reducer: {
-        cart: cartReducer,
         clients: clientsReducer,
     },
 });

@@ -1,1 +1,22 @@
 @import '~bootstrap/scss/bootstrap';
+
+.lightboxContainer {
+    background-color: rgba(0, 0, 0, 0.568);
+    position: absolute;
+    width: 100%;
+    top: 0;
+    height: 100%;
+}
+.lightbox {
+    background-color: white;
+    max-width: 500px;
+    margin: auto;
+    text-align: center;
+}
+.lightbox .nav {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    img {
+        cursor: pointer;
+    }
+}

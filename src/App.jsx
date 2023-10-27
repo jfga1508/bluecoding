@@ -1,53 +1,93 @@
 // @ts-nocheck
+import { useState } from 'react';
 import './App.scss';
-import { useDispatch, useSelector } from 'react-redux';
-import { cartActions } from './store/cartSlide';
-import { clientsAction } from './store/clientsSlide';
-import { useEffect } from 'react';
 
 function App() {
-    const cartItems = useSelector((state) => state.cart);
-    const clients = useSelector((state) => state.clients);
-    const dispatch = useDispatch();
+    const [gifs, setgifs] = useState([]);
+    const [lightbox, setlightbox] = useState({
+        state: false,
+        image: '',
+        nav: [],
+    });
+    const [keyword, setkeyword] = useState('');
 
-    const addItem = () => {
-        dispatch(
-            cartActions.addItem({
-                name: 'Peer',
-            })
-        );
-        dispatch(
-            clientsAction.addItem({
-                name: 'Jean',
-            })
-        );
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const key = keyword;
+        const data = await fetch(
+            'https://api.giphy.com/v1/gifs/search?api_key=' +
+                import.meta.env.VITE_GIF_KEY +
+                '&limit=10&q=' +
+                key
+        ).then((data) => data.json());
+
+        setgifs(data);
     };
 
-    useEffect(() => {
-        console.log(cartItems, clients);
-
-        return () => {};
-    }, [cartItems, clients]);
+    const openLightbox = (image) => {
+        setlightbox({
+            state: true,
+            image: image,
+            nav: gifs.data,
+        });
+    };
 
     return (
         <>
-            <h1>Vite + React</h1>
-            <div className='card'>
-                <button className='btn btn-primary' onClick={() => addItem()}>
-                    Add
+            <form>
+                <input
+                    type='text'
+                    name='keyword'
+                    onChange={(e) => setkeyword(e.target.value)}
+                    placeholder='Keyword'
+                />
+                <button
+                    className='btn btn-primary'
+                    onClick={(e) => handleSubmit(e)}
+                >
+                    Search
                 </button>
-                {clients.items &&
-                    clients.items.map((client, index) => (
-                        <p key={index}>{client.name}</p>
-                    ))}
-                <hr></hr>
-                {cartItems.items.map((item, index) => (
-                    <p key={index}>{item.name}</p>
-                ))}
+            </form>
+            <div>
+                <h1>Results</h1>
+                <div className='d-flex flex-wrap'>
+                    {gifs.data &&
+                        gifs.data.map((gif, index) => (
+                            <div key={index}>
+                                <img
+                                    className='mb-3'
+                                    src={gif.images.fixed_height.url}
+                                    onClick={() =>
+                                        openLightbox(gif.images.original.url)
+                                    }
+                                />
+                            </div>
+                        ))}
+                </div>
+                <div className='lightboxContainer'>
+                    <div className='lightbox'>
+                        <img src={lightbox.image} className='mb-3' />
+
+                        <ul className='d-flex nav'>
+                            {lightbox.nav &&
+                                lightbox.nav.map((gif, index) => (
+                                    <li key={index}>
+                                        <img
+                                            src={gif.images.fixed_height.url}
+                                            onClick={() =>
+                                                setlightbox({
+                                                    ...lightbox,
+                                                    image: gif.images.original
+                                                        .url,
+                                                })
+                                            }
+                                        />
+                                    </li>
+                                ))}
+                        </ul>
+                    </div>
+                </div>
             </div>
-            <p className='read-the-docs'>
-                Click on the Vite and React logos to learn more
-            </p>
         </>
     );
 }
